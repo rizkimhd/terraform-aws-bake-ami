@@ -14,9 +14,9 @@ resource "aws_cloudwatch_log_group" "bake_ami" {
 }
 
 resource "aws_codebuild_project" "bake_ami" {
-  name         = "${local.bake_project_name}"
+  name         = local.bake_project_name
   description  = "Bake ${var.service_name} AMI"
-  service_role = "${var.codebuild_role_arn}"
+  service_role = var.codebuild_role_arn
 
   artifacts {
     type           = "CODEPIPELINE"
@@ -25,20 +25,20 @@ resource "aws_codebuild_project" "bake_ami" {
   }
 
   cache {
-    type     = "${var.codebuild_cache_bucket == "" ? "NO_CACHE" : "S3"}"
+    type     = var.codebuild_cache_bucket == "" ? "NO_CACHE" : "S3"
     location = "${var.codebuild_cache_bucket}/${local.bake_project_name}"
   }
 
   environment {
-    compute_type = "${var.bake_codebuild_compute_type}"
-    image        = "${var.bake_codebuild_image}"
-    image_pull_credentials_type = "${var.bake_codebuild_image_credentials}"
-    type         = "${var.bake_codebuild_environment_type}"
+    compute_type                = var.bake_codebuild_compute_type
+    image                       = var.bake_codebuild_image
+    image_pull_credentials_type = var.bake_codebuild_image_credentials
+    type                        = var.bake_codebuild_environment_type
   }
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = "${data.template_file.ami_baking_buildspec.rendered}"
+    buildspec = local.ami_baking_buildspec
   }
 
   tags = {
@@ -52,11 +52,11 @@ resource "aws_codebuild_project" "bake_ami" {
 }
 
 resource "aws_codepipeline" "bake_ami" {
-  name     = "${local.pipeline_name}"
-  role_arn = "${var.codepipeline_role_arn}"
+  name     = local.pipeline_name
+  role_arn = var.codepipeline_role_arn
 
   artifact_store {
-    location = "${var.codepipeline_artifact_bucket}"
+    location = var.codepipeline_artifact_bucket
     type     = "S3"
   }
 
@@ -158,8 +158,8 @@ PATTERN
 }
 
 resource "aws_cloudwatch_event_target" "this" {
-  rule = "${aws_cloudwatch_event_rule.this.name}"
-  arn  = "${aws_codepipeline.bake_ami.arn}"
+  rule = aws_cloudwatch_event_rule.this.name
+  arn  = aws_codepipeline.bake_ami.arn
 
-  role_arn = "${var.events_role_arn}"
+  role_arn = var.events_role_arn
 }
