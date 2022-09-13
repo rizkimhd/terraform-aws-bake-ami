@@ -1,16 +1,7 @@
 resource "aws_cloudwatch_log_group" "bake_ami" {
-  name = "/aws/codebuild/${local.bake_project_name}"
-
-  retention_in_days = "30"
-
-  tags = {
-    Name          = "/aws/codebuild/${local.bake_project_name}"
-    ProductDomain = "${var.product_domain}"
-    Service       = "${var.service_name}"
-    Environment   = "management"
-    Description   = "LogGroup for ${var.service_name} Bake AMI"
-    ManagedBy     = "terraform"
-  }
+  name              = "/aws/codebuild/${local.bake_project_name}"
+  retention_in_days = var.log_retention_in_days
+  tags              = local.cwl_log_group_tags
 }
 
 resource "aws_codebuild_project" "bake_ami" {
@@ -41,14 +32,7 @@ resource "aws_codebuild_project" "bake_ami" {
     buildspec = local.ami_baking_buildspec
   }
 
-  tags = {
-    Name          = "${local.bake_project_name}"
-    Description   = "Bake ${var.service_name} AMI"
-    Service       = "${var.service_name}"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    ManagedBy     = "terraform"
-  }
+  tags = local.codebuild_tags
 }
 
 resource "aws_codepipeline" "bake_ami" {
@@ -72,9 +56,9 @@ resource "aws_codepipeline" "bake_ami" {
       output_artifacts = ["Playbook"]
 
       configuration = {
-        S3Bucket             = "${var.playbook_bucket}"
-        PollForSourceChanges = "${var.codepipeline_poll_for_source_changes}"
-        S3ObjectKey          = "${var.playbook_key}"
+        S3Bucket             = var.playbook_bucket
+        PollForSourceChanges = var.codepipeline_poll_for_source_changes
+        S3ObjectKey          = var.playbook_key
       }
 
       run_order = "1"
@@ -94,7 +78,7 @@ resource "aws_codepipeline" "bake_ami" {
       version          = "1"
 
       configuration = {
-        ProjectName = "${local.bake_project_name}"
+        ProjectName = local.bake_project_name
       }
 
       run_order = "1"
@@ -109,22 +93,15 @@ resource "aws_codepipeline" "bake_ami" {
       version         = "1"
 
       configuration = {
-        FunctionName   = "${var.lambda_function_name}"
-        UserParameters = "${jsonencode(local.user_parameters)}"
+        FunctionName   = var.lambda_function_name
+        UserParameters = jsonencode(local.user_parameters)
       }
 
       run_order = "2"
     }
   }
 
-  tags = {
-    Name          = "${local.pipeline_name}"
-    Description   = "${var.service_name} AMI Baking Pipeline"
-    Service       = "${var.service_name}"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    ManagedBy     = "terraform"
-  }
+  tags = local.codepipeline_tags
 }
 
 resource "aws_cloudwatch_event_rule" "this" {

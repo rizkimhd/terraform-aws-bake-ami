@@ -2,20 +2,48 @@ locals {
   bake_project_name = "${var.service_name}-bake-ami"
   pipeline_name     = "${var.service_name}-ami-baking"
   user_parameters = {
-    "slack_channel"  = "${var.slack_channel}"
-    "targetAccounts" = "${var.target_accounts}"
+    "slack_channel"  = var.slack_channel
+    "targetAccounts" = var.target_accounts
   }
 
+  common_tags = {
+    ProductDomain = var.product_domain
+    Service       = var.service_name
+    Environment   = var.environment
+    ManagedBy     = "terraform"
+  }
+
+  cwl_log_group_tags = merge(
+    local.common_tags,
+    var.cwl_log_group_additional_tags,
+    { "Name" = "/aws/codebuild/${local.bake_project_name}" },
+    { "Description" = "LogGroup for ${var.service_name} Bake AMI" },
+  )
+
+  codebuild_tags = merge(
+    local.common_tags,
+    var.codebuild_additional_tags,
+    { "Name" = local.bake_project_name },
+    { "Description" = "Bake ${var.service_name} AMI" },
+  )
+
+  codepipeline_tags = merge(
+    local.common_tags,
+    var.codebuild_additional_tags,
+    { "Name" = local.pipeline_name },
+    { "Description" = "${var.service_name} AMI Baking Pipeline" },
+  )
+
   ami_baking_buildspec = templatefile("${path.module}/ami_baking_buildspec.tftpl", {
-    ami_baking_artifact_bucket = "${var.engineering_manifest_bucket}"
-    ami_baking_project_name    = "${local.bake_project_name}"
-    template_instance_profile  = "${var.template_instance_profile}"
-    template_instance_sg       = "${var.template_instance_sg}"
-    base_ami_owners            = "${join(",", var.base_ami_owners)}"
-    base_ami_prefix            = "${var.base_ami_prefix}"
-    app_ami_prefix             = "${var.app_ami_prefix}"
-    subnet_id                  = "${var.subnet_id}"
-    vpc_id                     = "${var.vpc_id}"
-    region                     = "${data.aws_region.current.name}"
+    ami_baking_artifact_bucket = var.engineering_manifest_bucket
+    ami_baking_project_name    = local.bake_project_name
+    template_instance_profile  = var.template_instance_profile
+    template_instance_sg       = var.template_instance_sg
+    base_ami_owners            = join(",", var.base_ami_owners)
+    base_ami_prefix            = var.base_ami_prefix
+    app_ami_prefix             = var.app_ami_prefix
+    subnet_id                  = var.subnet_id
+    vpc_id                     = var.vpc_id
+    region                     = data.aws_region.current.name
   })
 }

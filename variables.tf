@@ -143,3 +143,27 @@ variable "target_accounts" {
   description = "The list of AWS accounts to which AMIs will be shared"
   default     = []
 }
+
+variable "log_retention_in_days" {
+  type        = number
+  description = "Cloudwatch log retention for ami-baking"
+  default     = 30
+}
+
+variable "cwl_log_group_additional_tags" {
+  type        = map(string)
+  description = "The list of tags to be attached to the cloudwatch log groups"
+  default     = {}
+}
+
+variable "codebuild_additional_tags" {
+  type        = map(string)
+  description = "The list of tags to be attached to the codebuild project"
+  default     = {}
+}
+
+variable "codepipeline_additional_tags" {
+  type        = map(string)
+  description = "The list of tags to be attached to the codepipeline"
+  default     = {}
+}
