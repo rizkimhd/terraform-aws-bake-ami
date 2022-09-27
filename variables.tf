@@ -35,11 +35,6 @@ variable "playbook_bucket" {
   description = "the S3 bucket that contains the AMI baking playbook"
 }
 
-variable "ami_manifest_bucket" {
-  type        = string
-  description = "the S3 bucket to which CodeBuild will store the resulting AMI's artifacts"
-}
-
 variable "playbook_key" {
   type        = string
   description = "the S3 key of the AMI baking playbook that will be used as the pipeline input. CodeBuild doesn't seem to support tar files"
