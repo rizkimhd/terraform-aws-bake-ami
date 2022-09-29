@@ -36,6 +36,8 @@ resource "aws_codebuild_project" "bake_ami" {
 }
 
 resource "aws_codepipeline" "bake_ami" {
+  count = var.codepipeline_role_arn == null ? 0 : 1
+
   name     = local.pipeline_name
   role_arn = var.codepipeline_role_arn
 
@@ -105,6 +107,8 @@ resource "aws_codepipeline" "bake_ami" {
 }
 
 resource "aws_cloudwatch_event_rule" "this" {
+  count = var.events_role_arn == null ? 0 : 1
+
   name        = "${local.pipeline_name}-trigger"
   description = "Capture each s3://${var.playbook_bucket}/${var.playbook_key} upload"
 
@@ -135,8 +139,10 @@ PATTERN
 }
 
 resource "aws_cloudwatch_event_target" "this" {
-  rule = aws_cloudwatch_event_rule.this.name
-  arn  = aws_codepipeline.bake_ami.arn
+  count = var.events_role_arn == null ? 0 : 1
+
+  rule = aws_cloudwatch_event_rule.this[*].name
+  arn  = aws_codepipeline.bake_ami[*].arn
 
   role_arn = var.events_role_arn
 }

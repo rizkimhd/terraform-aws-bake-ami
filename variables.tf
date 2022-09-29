@@ -110,6 +110,7 @@ variable "codebuild_role_arn" {
 variable "codepipeline_role_arn" {
   type        = string
   description = "The role arn to be assumed by the codepipeline"
+  default     = null
 }
 
 variable "lambda_function_name" {
@@ -120,6 +121,7 @@ variable "lambda_function_name" {
 variable "events_role_arn" {
   type        = string
   description = "The role arn to be assumed by the cloudwatch events rule"
+  default     = null
 }
 
 variable "slack_channel" {
