@@ -14,6 +14,12 @@ variable "environment" {
   description = "The environment where this ami baking pipeline is provisioned"
 }
 
+variable "architecture" {
+  type        = string
+  default     = "x86_64"
+  description = "The architecture used by the codebuild and the generated image. Valid options are x86_64/aarch64"
+}
+
 variable "base_ami_owners" {
   type        = list(string)
   description = "the owners (AWS account IDs) of the base AMIs that instances will be run from"

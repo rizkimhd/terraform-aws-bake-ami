@@ -1,15 +1,17 @@
 locals {
-  bake_project_name = "${var.service_name}-bake-ami"
-  pipeline_name     = "${var.service_name}-ami-baking"
+  bake_project_name = var.architecture == "x86_64" ?  "${var.service_name}-bake-ami" : "${var.service_name}_${var.architecture}-bake-ami"
+  pipeline_name     = var.architecture == "x86_64" ?  "${var.service_name}-ami-baking" : "${var.service_name}_${var.architecture}-ami-baking"
   user_parameters = {
     "slack_channel"  = var.slack_channel
     "targetAccounts" = var.target_accounts
   }
+  
 
   common_tags = {
     ProductDomain = var.product_domain
     Service       = var.service_name
     Environment   = var.environment
+    Architecture  = var.architecture
     ManagedBy     = "terraform"
   }
 
