@@ -35,6 +35,17 @@ variable "app_ami_prefix" {
   description = "The created app AMI will be named with this prefix"
 }
 
+variable "app_ami_suffix" {
+  type        = string
+  description = "The latest AMI which name follows this suffix will be used as the base AMI of your app AMI"
+  default     = ""
+}
+
+variable "aws_instance_type" {
+  type        = string
+  description = "AWS instance type that will be used for AMI baking"
+  default     = ""
+}
 
 variable "playbook_bucket" {
   type        = string

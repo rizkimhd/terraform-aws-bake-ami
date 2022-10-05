@@ -8,6 +8,8 @@ env:
     APP_TEMPLATE_INSTANCE_VPC_ID: "${vpc_id}"
     APP_TEMPLATE_INSTANCE_SUBNET_ID: "${subnet_id}"
     AMI_NAME_PREFIX: "${app_ami_prefix}"
+    AMI_NAME_SUFFIX: "${app_ami_suffix}"
+    AWS_INSTANCE_TYPE: "${aws_instance_type}"
     STACK_AMI_OWNERS: "${base_ami_owners}"
     STACK_AMI_NAME_FILTER: "${base_ami_prefix}"
 phases:

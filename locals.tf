@@ -6,6 +6,8 @@ locals {
     "targetAccounts" = var.target_accounts
   }
   
+  aws_instance_type = var.architecture == "x86_64" ? "t3.nano" : "t4g.nano"
+  app_ami_suffix    = var.architecture == "x86_64" ? "/hvm/x86_64" : "/hvm/aarch64"
 
   common_tags = {
     ProductDomain = var.product_domain
@@ -44,6 +46,8 @@ locals {
     base_ami_owners            = join(",", var.base_ami_owners)
     base_ami_prefix            = var.base_ami_prefix
     app_ami_prefix             = var.app_ami_prefix
+    app_ami_suffix             = coalesce(var.app_ami_suffix, local.app_ami_suffix)
+    aws_instance_type          = coalesce(var.aws_instance_type, local.aws_instance_type)
     subnet_id                  = var.subnet_id
     vpc_id                     = var.vpc_id
     region                     = data.aws_region.current.name
