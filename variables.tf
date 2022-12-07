@@ -181,3 +181,16 @@ variable "codepipeline_additional_tags" {
   description = "The list of tags to be attached to the codepipeline"
   default     = {}
 }
+
+
+variable "codebuild_project_name" {
+  type        = string
+  description = "The name of the codebuild project"
+  default     = null
+}
+
+variable "codepipeline_name" {
+  type        = string
+  description = "The name of the codepipeline"
+  default     = null
+}
