@@ -1,6 +1,9 @@
 locals {
-  bake_project_name = var.architecture == "x86_64" ?  "${var.service_name}-bake-ami" : "${var.service_name}_${var.architecture}-bake-ami"
-  pipeline_name     = var.architecture == "x86_64" ?  "${var.service_name}-ami-baking" : "${var.service_name}_${var.architecture}-ami-baking"
+  default_project_name  = var.architecture == "x86_64" ?  "${var.service_name}-bake-ami" : "${var.service_name}_${var.architecture}-bake-ami"
+  default_pipeline_name = var.architecture == "x86_64" ?  "${var.service_name}-ami-baking" : "${var.service_name}_${var.architecture}-ami-baking"
+  
+  bake_project_name = coalesce(var.codebuild_project_name, local.default_pipeline_name)
+  pipeline_name     = coalesce(var.codepipeline_name, local.default_pipeline_name)
   user_parameters = {
     "slack_channel"  = var.slack_channel
     "targetAccounts" = var.target_accounts
